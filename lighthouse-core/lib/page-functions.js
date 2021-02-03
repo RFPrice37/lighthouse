@@ -164,7 +164,7 @@ function getOuterHTMLSnippet(element, ignoreAttrs = [], snippetCharacterLimit = 
       let dirty = false;
 
       // Replace img.src with img.currentSrc.
-      if (attributeName === 'src' && element.tagName === 'IMG') {
+      if (attributeName === 'src' && 'currentSrc' in element) {
         const currentSrc = /** @type {HTMLImageElement} */ (element).currentSrc;
         // Only replace if the two URLs do not resolve to the same location.
         const documentHref = element.ownerDocument.location.href;

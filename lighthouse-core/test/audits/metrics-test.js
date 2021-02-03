@@ -136,4 +136,25 @@ describe('Performance: metrics', () => {
     const result = await MetricsAudit.audit(artifacts, context);
     expect(result.details.items[0].interactive).toEqual(undefined);
   });
+
+  it('evaluates LayoutShift variants correctly', async () => {
+    const artifacts = {
+      traces: {
+        [MetricsAudit.DEFAULT_PASS]: metricsAllFramesTrace,
+      },
+      devtoolsLogs: {
+        [MetricsAudit.DEFAULT_PASS]: metricsAllFramesDevtoolsLog,
+      },
+    };
+
+    const context = {settings: {throttlingMethod: 'simulate'}, computedCache: new Map()};
+    const {details} = await MetricsAudit.audit(artifacts, context);
+    expect(details.items[0]).toMatchObject({
+      layoutShiftAvgSessionGap5s: 0.0011656245471340055,
+      layoutShiftMaxSessionGap1s: 0.0011656245471340055,
+      layoutShiftMaxSessionGap1sLimit5s: 0.0011656245471340055,
+      layoutShiftMaxSliding1s: 0.0011656245471340055,
+      layoutShiftMaxSliding300ms: 0.0011656245471340055,
+    });
+  });
 });

@@ -140,10 +140,10 @@ describe('Performance: metrics', () => {
   it('evaluates LayoutShift variants correctly', async () => {
     const artifacts = {
       traces: {
-        [MetricsAudit.DEFAULT_PASS]: metricsAllFramesTrace,
+        [MetricsAudit.DEFAULT_PASS]: clsAllFramesTrace,
       },
       devtoolsLogs: {
-        [MetricsAudit.DEFAULT_PASS]: metricsAllFramesDevtoolsLog,
+        [MetricsAudit.DEFAULT_PASS]: clsAllFramesDevtoolsLog,
       },
     };
 

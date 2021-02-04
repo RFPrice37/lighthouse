@@ -60,12 +60,7 @@ describe('Layout Shift Variants', () => {
           tid: 222,
           ts: ts,
           args: {
-            data: {
-              is_main_frame: true,
-              had_recent_input,
-              score,
-              cumulative_score: cumulativeScore,
-            },
+            data: {is_main_frame: true, had_recent_input, score, cumulative_score: cumulativeScore},
           },
         };
       });

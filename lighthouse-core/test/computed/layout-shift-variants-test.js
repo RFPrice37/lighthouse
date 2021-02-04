@@ -6,6 +6,7 @@
 'use strict';
 
 const LayoutShiftVariants = require('../../computed/layout-shift-variants.js');
+const jumpyClsTrace = require('../fixtures/traces/jumpy-cls-m90.json');
 const frameMetricsTrace = require('../fixtures/traces/frame-metrics-m89.json');
 const preClsTrace = require('../fixtures/traces/progressive-app-m60.json');
 const createTestTrace = require('../create-test-trace.js');
@@ -19,6 +20,17 @@ describe('Layout Shift Variants', () => {
 
   describe('real traces', () => {
     it('calculates CLS variants for a trace', async () => {
+      const variants = await LayoutShiftVariants.request(jumpyClsTrace, context);
+      expect(variants).toEqual({
+        avgSessionGap5s: expect.toBeApproximately(4.809794, 6),
+        maxSessionGap1s: expect.toBeApproximately(2.897995, 6),
+        maxSessionGap1sLimit5s: expect.toBeApproximately(2.268816, 6),
+        maxSliding1s: expect.toBeApproximately(1.911799, 6),
+        maxSliding300ms: expect.toBeApproximately(1.436742, 6),
+      });
+    });
+
+    it('calculates CLS variants for a trace with a single (main frame) CLS event', async () => {
       // Only a single CLS `is_main_frame` event in this trace.
       const variants = await LayoutShiftVariants.request(frameMetricsTrace, context);
       expect(variants).toEqual({

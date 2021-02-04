@@ -21,7 +21,7 @@ const TraceOfTab = require('./trace-of-tab.js');
 class LayoutShiftVariants {
   /**
    * Calculates the average LayoutShift score across clusters of LayoutShift
-   * events, where a new cluster is created when there's a gap of at least 5s
+   * events, where a new cluster is created when there's a gap of more than 5s
    * since the last LayoutShift event.
    * @param {Array<LayoutShiftEvent>} layoutShiftEvents
    * @return {number}
@@ -44,8 +44,8 @@ class LayoutShiftVariants {
 
   /**
    * Calculates cumulative layout shifts per cluster (session) of LayoutShift
-   * events -- where a new cluster is created when there's a gap of at least
-   * `gapMs` ms since the last LayoutShift event or the cluster has reached
+   * events -- where a new cluster is created when there's a gap of more than
+   * `gapMs` ms since the last LayoutShift event or the cluster is greater than
    * `limitMs` ms long -- and returns the max LayoutShift score found.
    * `limitMs` is optional if no limit is needed.
    * @param {Array<LayoutShiftEvent>} layoutShiftEvents
@@ -72,8 +72,8 @@ class LayoutShiftVariants {
   }
 
   /**
-   * Returns the maximum cumulative layout shift in any `windowMs` ms window in
-   * the trace.
+   * Returns the maximum cumulative layout shift in any `windowMs` ms window
+   * (inclusive of bounds) in the trace.
    * @param {Array<LayoutShiftEvent>} layoutShiftEvents
    * @param {number} windowMs
    * @return {number}

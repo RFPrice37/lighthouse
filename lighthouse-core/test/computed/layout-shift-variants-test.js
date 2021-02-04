@@ -103,26 +103,6 @@ describe('Layout Shift Variants', () => {
       });
     });
 
-    it('calculates from two clusters of layout shift events', async () => {
-      const shiftEvents = [
-        {score: 0.0625, ts: 1_000_000},
-        {score: 0.1250, ts: 1_200_000},
-
-        {score: 0.2500, ts: 10_000_000},
-        {score: 0.5000, ts: 10_200_000},
-      ];
-      const trace = makeTrace(shiftEvents);
-
-      const variants = await LayoutShiftVariants.request(trace, context);
-      expect(variants).toEqual({
-        avgSessionGap5s: 0.46875,
-        maxSessionGap1s: 0.75,
-        maxSessionGap1sLimit5s: 0.75,
-        maxSliding1s: 0.75,
-        maxSliding300ms: 0.75,
-      });
-    });
-
     it('calculates from three clusters of layout shift events', async () => {
       const shiftEvents = [
         {score: 0.0625, ts: 1_000_000},
@@ -193,6 +173,62 @@ describe('Layout Shift Variants', () => {
         maxSessionGap1sLimit5s: 5,
         maxSliding1s: 5,
         maxSliding300ms: 2,
+      });
+    });
+
+    describe('variants include events on window/cluster bounds', () => {
+      it('avgSessionGap5s only counts gaps > 5s', async () => {
+        const shiftEvents = [
+          {score: 1, ts: 1_000_000},
+          {score: 1, ts: 6_000_000}, // Included since exactly 5s later.
+        ];
+        const trace = makeTrace(shiftEvents);
+        const variants = await LayoutShiftVariants.request(trace, context);
+        expect(variants.avgSessionGap5s).toEqual(2);
+      });
+
+      it('maxSessionGap1s only counts gaps > 1s', async () => {
+        const shiftEvents = [
+          {score: 1, ts: 1_000_000},
+          {score: 1, ts: 2_000_000}, // Included since exactly 1s later.
+        ];
+        const trace = makeTrace(shiftEvents);
+        const variants = await LayoutShiftVariants.request(trace, context);
+        expect(variants.maxSessionGap1s).toEqual(2);
+      });
+
+      it('maxSessionGap1sLimit5s counts gaps > 1s and limits cluster length to <= 5s', async () => {
+        const shiftEvents = [
+          {score: 1, ts: 1_000_000},
+          {score: 1, ts: 2_000_000}, // All of these included since exactly 1s after the last.
+          {score: 1, ts: 3_000_000},
+          {score: 1, ts: 4_000_000},
+          {score: 1, ts: 5_000_000},
+          {score: 1, ts: 6_000_000}, // Included since exactly 5s after beginning of cluster.
+        ];
+        const trace = makeTrace(shiftEvents);
+        const variants = await LayoutShiftVariants.request(trace, context);
+        expect(variants.maxSessionGap1sLimit5s).toEqual(6);
+      });
+
+      it('maxSliding1s includes events exactly 1s apart in window', async () => {
+        const shiftEvents = [
+          {score: 1, ts: 1_000_000},
+          {score: 1, ts: 2_000_000}, // Included since exactly 1s later.
+        ];
+        const trace = makeTrace(shiftEvents);
+        const variants = await LayoutShiftVariants.request(trace, context);
+        expect(variants.maxSliding1s).toEqual(2);
+      });
+
+      it('maxSliding300ms includes events exactly 300ms apart in window', async () => {
+        const shiftEvents = [
+          {score: 1, ts: 1_000_000},
+          {score: 1, ts: 1_300_000}, // Included since exactly 300ms later.
+        ];
+        const trace = makeTrace(shiftEvents);
+        const variants = await LayoutShiftVariants.request(trace, context);
+        expect(variants.maxSliding300ms).toEqual(2);
       });
     });
   });

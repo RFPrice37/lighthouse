@@ -150,7 +150,7 @@ describe('Layout Shift Variants', () => {
 
       const variants = await LayoutShiftVariants.request(trace, context);
       expect(variants).toEqual({
-        avgSessionGap5s: 3.75,
+        avgSessionGap5s: 3.75, // 30 * 0.125
         maxSessionGap1s: 3.75,
         maxSessionGap1sLimit5s: 3.75,
         maxSliding1s: 3.75,
@@ -160,29 +160,27 @@ describe('Layout Shift Variants', () => {
 
     it('includes events with recent input at beginning of trace, but ignores others', async () => {
       const shiftEvents = [
-        {score: 0.0625, ts: 250_000, had_recent_input: true},
-        {score: 0.2500, ts: 500_000, had_recent_input: true},
-        {score: 0.0625, ts: 1_250_000},
-        {score: 0.1250, ts: 2_200_000},
-        {score: 0.0625, ts: 3_100_000},
-        {score: 0.2500, ts: 3_400_000},
-        {score: 0.1250, ts: 4_350_000},
-        {score: 0.0625, ts: 5_300_000},
-        {score: 0.2500, ts: 6_000_000, had_recent_input: true},
+        {score: 1, ts: 250_000, had_recent_input: true},
+        {score: 1, ts: 500_000, had_recent_input: true},
+        {score: 1, ts: 750_000, had_recent_input: true},
+        {score: 1, ts: 1_000_000, had_recent_input: true}, // These first four events will still be counted.
 
-        {score: 0.1250, ts: 10_000_000},
-        {score: 0.1250, ts: 10_400_000, had_recent_input: true},
-        {score: 0.0625, ts: 10_680_000, had_recent_input: true},
+        {score: 1, ts: 1_250_000, had_recent_input: false},
+
+        {score: 1, ts: 1_500_000, had_recent_input: true}, // The last four will not.
+        {score: 1, ts: 1_750_000, had_recent_input: true},
+        {score: 1, ts: 2_000_000, had_recent_input: true},
+        {score: 1, ts: 2_250_000, had_recent_input: true},
       ];
       const trace = makeTrace(shiftEvents);
 
       const variants = await LayoutShiftVariants.request(trace, context);
       expect(variants).toEqual({
-        avgSessionGap5s: 1.125,
-        maxSessionGap1s: 1,
-        maxSessionGap1sLimit5s: 0.9375,
-        maxSliding1s: 0.375,
-        maxSliding300ms: 0.3125,
+        avgSessionGap5s: 5,
+        maxSessionGap1s: 5,
+        maxSessionGap1sLimit5s: 5,
+        maxSliding1s: 5,
+        maxSliding300ms: 2,
       });
     });
   });

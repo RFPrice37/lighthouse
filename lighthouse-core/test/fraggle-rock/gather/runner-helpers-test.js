@@ -33,6 +33,13 @@ describe('collectArtifactDependencies', () => {
     expect(result).toEqual({});
   });
 
+  it('should handle empty dependencies', async () => {
+    // @ts-expect-error - this isn't valid given our set of types, but plugins might do this.
+    artifact.dependencies = {};
+    const result = await helpers.collectArtifactDependencies(artifact, artifactsById);
+    expect(result).toEqual({});
+  });
+
   it('should handle successful dependencies', async () => {
     const result = await helpers.collectArtifactDependencies(artifact, artifactsById);
     expect(result).toEqual({ImageElements: []});

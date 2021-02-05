@@ -62,8 +62,9 @@ function resolveWorkingCopy(configJSON, context) {
  * @return {LH.Config.ArtifactDefn['dependencies']}
  */
 function resolveArtifactDependencies(artifact, gatherer, artifactDefnsBySymbol) {
-  if ('dependencies' in gatherer.instance.meta) {
-    const dependencies = Object.entries(gatherer.instance.meta.dependencies).map(
+  if (!('dependencies' in gatherer.instance.meta)) return undefined;
+
+  const dependencies = Object.entries(gatherer.instance.meta.dependencies).map(
       ([dependencyName, artifactSymbol]) => {
         const dependency = artifactDefnsBySymbol.get(artifactSymbol);
 
@@ -76,12 +77,9 @@ function resolveArtifactDependencies(artifact, gatherer, artifactDefnsBySymbol) 
 
         return [dependencyName, {id: dependency.id}];
       }
-    );
+  );
 
-    return Object.fromEntries(dependencies);
-  } else {
-    return undefined;
-  }
+  return Object.fromEntries(dependencies);
 }
 
 /**

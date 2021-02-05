@@ -67,7 +67,10 @@ describe('Timespan Runner', () => {
   });
 
   it('should invoke beforeTimespan', async () => {
-
+    const timespan = await startTimespan({page, config});
+    expect(gathererA.beforeTimespan).toHaveBeenCalled();
+    expect(gathererB.beforeTimespan).toHaveBeenCalled();
+    await timespan.endTimespan();
   });
 
   it('should collect base artifacts', async () => {
